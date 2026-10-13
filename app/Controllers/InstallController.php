@@ -12,7 +12,8 @@ use App\Services\Installer;
 
 /**
  * Instalação pelo navegador para hospedagens sem SSH.
- * Só existe enquanto INSTALL_TOKEN estiver definido no .env, e exige o token na URL.
+ * Fica fechada (404). Para abrir: crie o arquivo vazio storage/instalar.liberado
+ * (apagado automaticamente ao concluir) ou defina INSTALL_TOKEN no .env e passe ?token= na URL.
  */
 final class InstallController extends Controller
 {
@@ -49,11 +50,18 @@ final class InstallController extends Controller
                 $logger('administrador criado');
             }
         }
+        @unlink(self::MARKER); // instalação feita: o instalador volta a ficar fechado
         return $this->view('pages/install', ['title' => 'Instalação', 'done' => $log, 'installed' => true, 'token' => $this->request->input('token'), 'noindex' => true]);
     }
 
+    /** Arquivo vazio criado pelo gerenciador de arquivos da hospedagem para liberar o instalador uma vez. */
+    private const MARKER = BASE_PATH . '/storage/instalar.liberado';
+
     private function guard(): void
     {
+        if (is_file(self::MARKER)) {
+            return;
+        }
         $token = (string) env('INSTALL_TOKEN', '');
         $sent = (string) ($this->request->input('token') ?? '');
         if (strlen($token) < 20 || !hash_equals($token, $sent)) {

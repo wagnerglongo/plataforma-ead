@@ -1,7 +1,7 @@
 <div class="container container-narrow" style="padding:3rem var(--gutter) 4rem">
   <h1 style="font-size:var(--step-3)">Instalação</h1>
   <?php if (!empty($done)): ?>
-    <div class="alert alert-success"><?= icon('check-circle') ?><div><p><strong>Pronto.</strong> Agora apague a linha INSTALL_TOKEN do arquivo .env.</p><ul><?php foreach ($done as $l): ?><li><?= e($l) ?></li><?php endforeach; ?></ul></div></div>
+    <div class="alert alert-success"><?= icon('check-circle') ?><div><p><strong>Pronto.</strong> O instalador foi fechado. Se você usou INSTALL_TOKEN no .env, apague essa linha.</p><ul><?php foreach ($done as $l): ?><li><?= e($l) ?></li><?php endforeach; ?></ul></div></div>
     <a class="btn" href="<?= url('entrar') ?>">Ir para o login</a>
   <?php else: ?>
     <?php if ($installed): ?><div class="alert alert-warning"><?= icon('alert') ?><p>O banco já tem usuários. A opção de demonstração apaga tudo.</p></div><?php endif; ?>

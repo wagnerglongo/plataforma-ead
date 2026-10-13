@@ -30,7 +30,7 @@ A raiz do site (`public_html` ou a pasta do subdomínio) recebe **o projeto inte
    APP_ENV=production
    APP_DEBUG=false
    APP_URL=https://seu-dominio.com.br
-   APP_KEY=<valor de php bin/ead key>
+   APP_KEY=                 # em branco: gerada sozinha em storage/app.key
    DB_HOST=localhost
    DB_DATABASE=u123456789_ead
    DB_USERNAME=u123456789_ead
@@ -45,7 +45,7 @@ A raiz do site (`public_html` ou a pasta do subdomínio) recebe **o projeto inte
    ```
 5. **Instalar:**
    - Com SSH (hPanel › Avançado › Acesso SSH): `php bin/ead install` (pede e-mail e nome do administrador e mostra uma senha provisória).
-   - Sem SSH: defina `INSTALL_TOKEN` no `.env` com um valor longo, acesse `https://seu-dominio.com.br/instalar?token=<valor>`, conclua e **apague a linha** `INSTALL_TOKEN`.
+   - Sem SSH: no gerenciador de arquivos, crie o arquivo vazio `storage/instalar.liberado` e acesse `https://seu-dominio.com.br/instalar`. Ao concluir, o arquivo é apagado e o instalador volta a responder 404.
 6. **Permissões:** `storage/` e `public/uploads/` precisam ser graváveis pelo PHP (755 na Hostinger já funciona).
 7. **HTTPS:** ative o SSL gratuito no hPanel. A plataforma envia HSTS automaticamente quando acessada por HTTPS.
 

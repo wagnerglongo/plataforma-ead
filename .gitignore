@@ -8,3 +8,5 @@
 Thumbs.db
 /node_modules/
 /tests/screenshots/
+/storage/app.key
+/storage/instalar.liberado

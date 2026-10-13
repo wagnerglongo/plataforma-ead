@@ -8,7 +8,7 @@ return [
         'env'      => env('APP_ENV', 'production'),
         'debug'    => (bool) env('APP_DEBUG', false),
         'url'      => rtrim((string) env('APP_URL', 'http://localhost:8000'), '/'),
-        'key'      => (string) env('APP_KEY', ''),
+        'key'      => app_key(),
         'demo'     => (bool) env('DEMO_MODE', false),
         'timezone' => env('APP_TIMEZONE', 'America/Sao_Paulo'),
     ],

@@ -13,6 +13,27 @@ function env(string $key, mixed $default = null): mixed
     return Env::get($key, $default);
 }
 
+/**
+ * Chave da aplicação (assina certificados). Usa APP_KEY do .env; se não houver,
+ * gera uma vez e guarda em storage/app.key (fora da web). Nunca troque depois de emitir certificados.
+ */
+function app_key(): string
+{
+    $fromEnv = (string) Env::get('APP_KEY', '');
+    if (strlen($fromEnv) >= 32) {
+        return $fromEnv;
+    }
+    $file = BASE_PATH . '/storage/app.key';
+    if (is_file($file) && strlen($key = trim((string) file_get_contents($file))) >= 32) {
+        return $key;
+    }
+    $key = bin2hex(random_bytes(32));
+    if (@file_put_contents($file, $key, LOCK_EX) !== false) {
+        @chmod($file, 0600);
+    }
+    return $key;
+}
+
 function config(string $key, mixed $default = null): mixed
 {
     static $config = null;
