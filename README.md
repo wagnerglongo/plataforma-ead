@@ -2,10 +2,9 @@
 
 Plataforma de cursos online completa (LMS) feita **em PHP puro, sem framework e sem nenhuma dependência externa**: catálogo público, área do aluno com player que retoma de onde parou, avaliações, certificados em PDF com QR Code e validação pública, e um painel administrativo com relatórios, permissões, auditoria, backup e ferramentas de LGPD.
 
-**Demonstração:** https://plataforma-ead.wglsoftware.com
-Acesso de teste (senha `demo1234`): `aluno@demo.com` · `admin@demo.com` · `coordenacao@demo.com` · `suporte@demo.com`
+**No ar:** https://plataforma-ead.wglsoftware.com
 
-> A instituição (Instituto Horizonte), as pessoas e os dados da demonstração são fictícios.
+Com os dados de demonstração (`php bin/ead demo`), a plataforma sobe com um instituto fictício, 7 cursos, cerca de 50 alunos com progresso e certificados, e as contas `aluno@demo.com`, `admin@demo.com`, `coordenacao@demo.com` e `suporte@demo.com` (senha `demo1234`). As telas abaixo são dessa demonstração; instituição, pessoas e dados são fictícios.
 
 ![Página inicial](docs/screenshots/home.png)
 
