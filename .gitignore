@@ -1,0 +1,10 @@
+.env
+/storage/app/*
+!/storage/app/demo/
+/public/uploads/*
+!/public/uploads/.htaccess
+!/public/uploads/.gitignore
+.DS_Store
+Thumbs.db
+/node_modules/
+/tests/screenshots/

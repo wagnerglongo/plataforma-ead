@@ -1,0 +1,15 @@
+# Para hospedagem compartilhada onde a raiz do site aponta para esta pasta
+# (ex.: public_html na Hostinger): tudo é servido a partir de public/,
+# e app/, storage/, .env etc. ficam inacessíveis pela web.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(\.env|\.git|app|bin|config|database|resources|routes|storage|tools|views|docs|tests)(/|$) - [F,L]
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

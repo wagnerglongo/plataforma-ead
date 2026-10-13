@@ -1,0 +1,5 @@
+# Nenhum script roda a partir da pasta de uploads.
+<FilesMatch "\.(php|phtml|php\d|phar|pl|py|cgi|sh)$">
+    Require all denied
+</FilesMatch>
+Options -Indexes -ExecCGI

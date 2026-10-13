@@ -1,0 +1,2 @@
+-- Coloque aqui alterações de banco numeradas (ex.: 0002_nova_coluna.sql).
+-- `php bin/ead migrate` aplica as que ainda não rodaram.

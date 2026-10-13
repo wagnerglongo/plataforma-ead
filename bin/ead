@@ -1,0 +1,110 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * Linha de comando da plataforma.
+ *
+ *   php bin/ead install              cria as tabelas, perfis e o primeiro administrador
+ *   php bin/ead migrate              aplica alterações pendentes de banco
+ *   php bin/ead demo                 APAGA tudo e recria com dados de demonstração
+ *   php bin/ead backup               gera um backup .sql.gz em storage/backups
+ *   php bin/ead restore <arquivo>    restaura um backup
+ *   php bin/ead key                  gera um valor novo para APP_KEY
+ *   php bin/ead check                confere requisitos do servidor
+ */
+
+if (PHP_SAPI !== 'cli') {
+    exit("Somente linha de comando.\n");
+}
+
+define('BASE_PATH', dirname(__DIR__));
+require BASE_PATH . '/app/bootstrap.php';
+
+use App\Services\BackupService;
+use App\Services\Installer;
+
+$log = static fn (string $msg) => fwrite(STDOUT, "  · {$msg}\n");
+$command = $argv[1] ?? 'help';
+
+try {
+    switch ($command) {
+        case 'install':
+            Installer::migrate($log);
+            Installer::baseData($log);
+            if ((int) App\Core\Database::value('SELECT COUNT(*) FROM users') === 0) {
+                $email = $argv[2] ?? readline('E-mail do administrador: ');
+                $name = $argv[3] ?? readline('Nome do administrador: ');
+                $password = bin2hex(random_bytes(6)) . 'A1';
+                Installer::createAdmin(trim($name), trim($email), $password);
+                $log("administrador criado: {$email}");
+                $log("senha provisória: {$password} (troque no primeiro acesso)");
+            }
+            break;
+
+        case 'migrate':
+            Installer::migrate($log);
+            break;
+
+        case 'demo':
+            if (!in_array('--force', $argv, true) && config('app.env') === 'production' && !config('app.demo')) {
+                throw new RuntimeException('Produção sem DEMO_MODE: use --force se tem certeza de que quer apagar tudo.');
+            }
+            Installer::dropAll($log);
+            Installer::migrate($log);
+            Installer::baseData($log);
+            Installer::demoData($log);
+            $log('acessos: admin@demo.com · coordenacao@demo.com · suporte@demo.com · aluno@demo.com (senha demo1234)');
+            break;
+
+        case 'backup':
+            $file = BackupService::create();
+            $log('backup gerado: ' . $file);
+            $removed = BackupService::prune((int) ($argv[2] ?? 14));
+            if ($removed) {
+                $log("{$removed} backup(s) antigos removidos");
+            }
+            break;
+
+        case 'restore':
+            $file = $argv[2] ?? throw new RuntimeException('Informe o arquivo: php bin/ead restore storage/backups/arquivo.sql.gz');
+            BackupService::restore($file);
+            $log('backup restaurado');
+            break;
+
+        case 'key':
+            fwrite(STDOUT, 'APP_KEY=' . bin2hex(random_bytes(32)) . "\n");
+            break;
+
+        case 'check':
+            $checks = [
+                'PHP 8.1 ou superior' => version_compare(PHP_VERSION, '8.1.0', '>='),
+                'Extensão pdo_mysql' => extension_loaded('pdo_mysql'),
+                'Extensão gd com FreeType' => function_exists('imagettftext'),
+                'Extensão mbstring' => extension_loaded('mbstring'),
+                'Extensão intl' => extension_loaded('intl'),
+                'Extensão fileinfo' => extension_loaded('fileinfo'),
+                'Extensão zlib' => function_exists('gzencode'),
+                'APP_KEY definida' => strlen((string) config('app.key')) >= 32,
+                'storage/ gravável' => is_writable(BASE_PATH . '/storage'),
+                'public/uploads gravável' => is_writable(BASE_PATH . '/public/uploads'),
+            ];
+            try {
+                App\Core\Database::pdo();
+                $checks['Conexão com o banco'] = true;
+            } catch (Throwable) {
+                $checks['Conexão com o banco'] = false;
+            }
+            foreach ($checks as $label => $ok) {
+                fwrite(STDOUT, ($ok ? '  [ok]   ' : '  [FALHA] ') . $label . "\n");
+            }
+            break;
+
+        default:
+            fwrite(STDOUT, "Comandos: install, migrate, demo, backup, restore <arquivo>, key, check\n");
+    }
+} catch (Throwable $e) {
+    fwrite(STDERR, 'Erro: ' . $e->getMessage() . "\n");
+    exit(1);
+}
